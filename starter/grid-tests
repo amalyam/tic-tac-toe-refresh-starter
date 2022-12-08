@@ -1,3 +1,9 @@
+let emptyGrid = [
+  [" ", " ", " "],
+  [" ", " ", " "],
+  [" ", " ", " "],
+];
+
 let grid1 = [
   ["X", "X", "X"],
   [" ", " ", " "],
@@ -16,26 +22,18 @@ let grid3 = [
   ["X", "X", "X"],
 ];
 
-//horizontal
-function checkWin(grid) {
-    let winningLetter;
-  let result;
-  for (let h = 0; h < grid.length; h++) {
-    winningLetter = grid[0][h];
-    let count = 0;
-    for (let v = 1; v < grid[0].length; v++) {
-      if (winningLetter != grid[v][h] || grid[v][h] === " ") {
-        result = false;
-      } else {
-        count++;
-        if (count === 2) {
-          return winningLetter;
-        }
-      }
-    }
-  } */
-}
+let tieGrid = [
+  ["X", "O", "X"],
+  ["X", "O", "O"],
+  ["O", "X", "O"],
+];
 
-console.log(checkWin(grid1));
-console.log(checkWin(grid2));
-console.log(checkWin(grid3));
+let noWinGrid = [
+  ["X", "X", " "],
+  ["X", "O", "O"],
+  ["O", "X", "O"],
+];
+
+function checkWin(grid) {}
+
+console.log(checkWin(tieGrid));

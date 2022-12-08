@@ -18,43 +18,59 @@ class TTT {
     Screen.setGridlines(true);
 
     // Replace this with real commands
-    Screen.addCommand("ArrowUp", "move cursor up");
+    Screen.addCommand("ArrowUp", "move cursor up", this.cursor.up());
+    Screen.addCommand("ArrowDown", "move cursor down", this.cursor.down());
+    Screen.addCommand("ArrowLeft", "move cursor left", this.cursor.left());
+    Screen.addCommand("ArrowRight", "move cursor right", this.cursor.right());
 
     Screen.render();
   }
 
   static checkWin(grid) {
-    let emptyGrid = [
-      [" ", " ", " "],
-      [" ", " ", " "],
-      [" ", " ", " "],
-    ];
+    // Returns 'X' if player X wins
+    // Returns 'O' if player O wins
+    // Returns 'T' if the game is a tie
+    // Returns false if the game has not ended
+    const emptyGrid = grid.every((row) => row.every((space) => space === " "));
+    const fullGrid = grid.every((row) => row.every((space) => space !== " "));
 
-    if (grid === emptyGrid) {
+    if (emptyGrid) {
       // Return false if the game has not ended
       return false;
     } else {
-      let horizontalWin = horizontalCheck(grid);
-      if (horizontalWin) {
-        //if horizontalCheck did not return a falsey,
-        //return the letter in the first place in the returned array
-        return horizontalWin[0][0];
-
-        //else, check for a diagonal win
+      if (TTT.horizontalCheck(grid)) {
+        //horizontal win
+        return TTT.horizontalCheck(grid);
       } else {
-        //if no horizontal or diagonal win, check for vertical win
+        if (TTT.diagonalCheck(grid)) {
+          //diagonal win
+          return TTT.diagonalCheck(grid);
+        } else {
+          if (TTT.verticalCheck(grid)) {
+            //vertical win
+            return TTT.verticalCheck(grid);
+          } else {
+            if (fullGrid === true) {
+              //game ended in a tie
+              return "T";
+            } else {
+              // Return false if the game has not ended
+              return false;
+            }
+          }
+        }
       }
-    // Return 'X' if player X wins
-    // Return 'O' if player O wins
-    // Return 'T' if the game is a tie
+      // Return 'X' if player X wins
+      // Return 'O' if player O wins
+      // Return 'T' if the game is a tie
     }
   }
 
-  
-
   static horizontalCheck(grid) {
-    return grid.find((row) =>
-    row.every((space) => row[0] === space && space != " ")
+    let win = grid.find((row) =>
+      row.every((space) => row[0] === space && space != " ")
+    );
+    return win[0];
   }
 
   static diagonalCheck(grid) {
@@ -62,8 +78,8 @@ class TTT {
       return grid[0][0];
     } else if (grid[0][2] === grid[1][1] && grid[0][2] === grid[2][0]) {
       return grid[0][2];
+    }
   }
-}
 
   static verticalCheck(grid) {
     let winningLetter;
