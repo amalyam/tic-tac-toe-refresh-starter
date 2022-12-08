@@ -37,32 +37,22 @@ class TTT {
     if (emptyGrid) {
       // Return false if the game has not ended
       return false;
-    } else {
-      if (TTT.horizontalCheck(grid)) {
+      } else if (TTT.horizontalCheck(grid)) {
         //horizontal win
         return TTT.horizontalCheck(grid);
+      } else if (TTT.diagonalCheck(grid)) {
+        //diagonal win
+        return TTT.diagonalCheck(grid);
+      } else if (TTT.verticalCheck(grid)) {
+        //vertical win
+        return TTT.verticalCheck(grid);
+      } else if (fullGrid === true) {
+        //tie game
+        return "T";
       } else {
-        if (TTT.diagonalCheck(grid)) {
-          //diagonal win
-          return TTT.diagonalCheck(grid);
-        } else {
-          //vertical win
-          if (TTT.verticalCheck(grid)) {
-            return TTT.verticalCheck(grid);
-          } else {
-            if (fullGrid === true) {
-              //tie game
-              return "T";
-            } else {
-              // Return false if the game has not ended
-              return false;
-            }
-          }
-        }
+        // Return false if the game has not ended
+        return false;
       }
-      // Return 'X' if player X wins
-      // Return 'O' if player O wins
-      // Return 'T' if the game is a tie
     }
   }
 
