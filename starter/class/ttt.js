@@ -46,12 +46,12 @@ class TTT {
           //diagonal win
           return TTT.diagonalCheck(grid);
         } else {
+          //vertical win
           if (TTT.verticalCheck(grid)) {
-            //vertical win
             return TTT.verticalCheck(grid);
           } else {
             if (fullGrid === true) {
-              //game ended in a tie
+              //tie game
               return "T";
             } else {
               // Return false if the game has not ended
@@ -70,7 +70,11 @@ class TTT {
     let win = grid.find((row) =>
       row.every((space) => row[0] === space && space != " ")
     );
-    return win[0];
+    if (win) {
+      return win[0];
+    } else {
+      return false;
+    }
   }
 
   static diagonalCheck(grid) {
