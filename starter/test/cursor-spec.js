@@ -1,24 +1,21 @@
-const { expect } = require('chai');
+const { expect } = require("chai");
 
 const Cursor = require("../class/cursor.js");
 const Screen = require("../class/screen.js");
 
-describe ('Cursor', function () {
-
+describe("Cursor", function () {
   let cursor;
 
-  beforeEach(function() {
+  beforeEach(function () {
     cursor = new Cursor(3, 3);
   });
 
-
-  it('initializes for a 3x3 grid', function () {
+  it("initializes for a 3x3 grid", function () {
     expect(cursor.row).to.equal(0);
     expect(cursor.col).to.equal(0);
   });
 
-  it('correctly processes down inputs', function () {
-
+  it("correctly processes down inputs", function () {
     cursor.down();
     expect([cursor.row, cursor.col]).to.deep.equal([1, 0]);
 
@@ -29,8 +26,7 @@ describe ('Cursor', function () {
     expect([cursor.row, cursor.col]).to.deep.equal([2, 0]);
   });
 
-  it('correctly processes up inputs', function () {
-
+  it("correctly processes up inputs", function () {
     cursor.up();
     expect([cursor.row, cursor.col]).to.deep.equal([0, 0]);
 
@@ -41,8 +37,7 @@ describe ('Cursor', function () {
     expect([cursor.row, cursor.col]).to.deep.equal([0, 0]);
   });
 
-  it('processes right inputs', function () {
-
+  it("processes right inputs", function () {
     cursor.right();
     expect([cursor.row, cursor.col]).to.deep.equal([0, 1]);
 
@@ -53,8 +48,7 @@ describe ('Cursor', function () {
     expect([cursor.row, cursor.col]).to.deep.equal([0, 2]);
   });
 
-  it('processes left inputs', function () {
-
+  it("processes left inputs", function () {
     cursor.left();
     expect([cursor.row, cursor.col]).to.deep.equal([0, 0]);
 
@@ -65,7 +59,9 @@ describe ('Cursor', function () {
     expect([cursor.row, cursor.col]).to.deep.equal([0, 0]);
   });
 
-
-
+  //new tests below
+  it("highlights the cursor's current position on the grid", function () {});
+  expect().to.;
+  cursor.row = 1;
+  cursor.col = 1;
 });
-

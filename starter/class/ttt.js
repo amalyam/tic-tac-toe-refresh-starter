@@ -16,13 +16,41 @@ class TTT {
     // Initialize a 3x3 tic-tac-toe grid
     Screen.initialize(3, 3);
     Screen.setGridlines(true);
+    this.cursor.setBackgroundColor(); //needed?
 
-    // Replace this with real commands
-    Screen.addCommand("ArrowUp", "move cursor up", this.cursor.up());
-    Screen.addCommand("ArrowDown", "move cursor down", this.cursor.down());
-    Screen.addCommand("ArrowLeft", "move cursor left", this.cursor.left());
-    Screen.addCommand("ArrowRight", "move cursor right", this.cursor.right());
+    Screen.addCommand(
+      "ArrowUp",
+      "move cursor up",
+      this.cursor.up.bind(this.cursor)
+    );
+    Screen.addCommand(
+      "ArrowDown",
+      "move cursor down",
+      this.cursor.down.bind(this.cursor)
+    );
+    Screen.addCommand(
+      "ArrowLeft",
+      "move cursor left",
+      this.cursor.left.bind(this.cursor)
+    );
+    Screen.addCommand(
+      "ArrowRight",
+      "move cursor right",
+      this.cursor.right.bind(this.cursor)
+    );
 
+    //Create a command in ttt.js that places a move at the cursor's position
+    Screen.addCommand(
+      "Enter",
+      "place move at cursor position",
+      this.qplaceMove(this.cursor)
+    );
+
+    Screen.render();
+  }
+
+  placeMove() {
+    this.grid[this.cursor.row][this.cursor.col] = this.playerTurn;
     Screen.render();
   }
 
@@ -37,22 +65,21 @@ class TTT {
     if (emptyGrid) {
       // Return false if the game has not ended
       return false;
-      } else if (TTT.horizontalCheck(grid)) {
-        //horizontal win
-        return TTT.horizontalCheck(grid);
-      } else if (TTT.diagonalCheck(grid)) {
-        //diagonal win
-        return TTT.diagonalCheck(grid);
-      } else if (TTT.verticalCheck(grid)) {
-        //vertical win
-        return TTT.verticalCheck(grid);
-      } else if (fullGrid === true) {
-        //tie game
-        return "T";
-      } else {
-        // Return false if the game has not ended
-        return false;
-      }
+    } else if (TTT.horizontalCheck(grid)) {
+      //horizontal win
+      return TTT.horizontalCheck(grid);
+    } else if (TTT.diagonalCheck(grid)) {
+      //diagonal win
+      return TTT.diagonalCheck(grid);
+    } else if (TTT.verticalCheck(grid)) {
+      //vertical win
+      return TTT.verticalCheck(grid);
+    } else if (fullGrid === true) {
+      //tie game
+      return "T";
+    } else {
+      // Return false if the game has not ended
+      return false;
     }
   }
 
