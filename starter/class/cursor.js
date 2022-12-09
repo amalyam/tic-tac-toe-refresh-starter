@@ -1,4 +1,5 @@
 const Screen = require("./screen");
+const TTT = require("./ttt");
 
 class Cursor {
   constructor(numRows, numCols) {
@@ -10,6 +11,7 @@ class Cursor {
 
     this.gridColor = "black";
     this.cursorColor = "yellow";
+    this.textColor = "magenta";
   }
 
   //Use setBackgroundColor and resetBackgroundColor in cursor.js
@@ -21,6 +23,11 @@ class Cursor {
 
   setBackgroundColor() {
     Screen.setBackgroundColor(this.row, this.col, this.cursorColor);
+    Screen.render();
+  }
+
+  setTextColor() {
+    Screen.setTextColor(this.row, this.col, this.textColor);
     Screen.render();
   }
 
@@ -45,21 +52,29 @@ class Cursor {
   }
 
   left() {
-    this.setBackgroundColor();
+    this.resetBackgroundColor();
 
     if (this.col > 0) {
       this.col--;
     }
 
-    this.resetBackgroundColor();
+    this.setBackgroundColor();
   }
 
   right() {
+    this.resetBackgroundColor();
+
     if (this.col < 2) {
       this.col++;
     }
-    this.resetBackgroundColor();
+
     this.setBackgroundColor();
+  }
+
+  return(playerTurn) {
+    this.resetBackgroundColor();
+    this.setTextColor();
+    Screen.setGrid(this.cursor.row, this.cursor.col, playerTurn);
   }
 }
 

@@ -18,39 +18,37 @@ class TTT {
     Screen.setGridlines(true);
     this.cursor.setBackgroundColor(); //needed?
 
+    Screen.addCommand("up", "move cursor up", this.cursor.up.bind(this.cursor));
     Screen.addCommand(
-      "ArrowUp",
-      "move cursor up",
-      this.cursor.up.bind(this.cursor)
-    );
-    Screen.addCommand(
-      "ArrowDown",
+      "down",
       "move cursor down",
       this.cursor.down.bind(this.cursor)
     );
     Screen.addCommand(
-      "ArrowLeft",
+      "left",
       "move cursor left",
       this.cursor.left.bind(this.cursor)
     );
     Screen.addCommand(
-      "ArrowRight",
+      "right",
       "move cursor right",
       this.cursor.right.bind(this.cursor)
     );
 
     //Create a command in ttt.js that places a move at the cursor's position
     Screen.addCommand(
-      "Enter",
+      "return",
       "place move at cursor position",
-      this.qplaceMove(this.cursor)
+      TTT.placeMove.bind(this)
     );
 
     Screen.render();
   }
 
-  placeMove() {
-    this.grid[this.cursor.row][this.cursor.col] = this.playerTurn;
+  static placeMove() {
+    //why does this need to be static? what is bind doing exactly in addCommand above?
+    Screen.render();
+    Screen.setGrid(this.cursor.row, this.cursor.col, this.playerTurn);
     Screen.render();
   }
 
