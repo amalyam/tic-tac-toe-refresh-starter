@@ -59,7 +59,7 @@ class TTT {
       }
       Screen.setMessage(`Player ${this.playerTurn}'s move.`);
       Screen.render();
-      TTT.checkWin.bind(this, this.grid);
+      TTT.endGame(TTT.checkWin(Screen.grid));
     } else {
       Screen.setMessage(
         "That space is already occupied. Choose another space."
@@ -136,15 +136,17 @@ class TTT {
   }
 
   static endGame(winner) {
-    if (winner === "O" || winner === "X") {
-      Screen.setMessage(`Player ${winner} wins!`);
-    } else if (winner === "T") {
-      Screen.setMessage(`Tie game!`);
-    } else {
-      Screen.setMessage(`Game Over`);
+    if (winner) {
+      if (winner === "O" || winner === "X") {
+        Screen.setMessage(`Player ${winner} wins!`);
+      } else if (winner === "T") {
+        Screen.setMessage(`Tie game!`);
+      } else {
+        Screen.setMessage(`Game Over`);
+      }
+      Screen.render();
+      Screen.quit();
     }
-    Screen.render();
-    Screen.quit();
   }
 }
 
