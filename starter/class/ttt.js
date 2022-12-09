@@ -49,7 +49,8 @@ class TTT {
   static placeMove() {
     //what is bind doing exactly in addCommand above?
     Screen.render();
-    if (TTT.spaceOpen.bind(this.cursor, this.grid)) {
+    //why couldn't I do below with this.grid
+    if (Screen.grid[this.cursor.row][this.cursor.col] === " ") {
       Screen.setGrid(this.cursor.row, this.cursor.col, this.playerTurn);
       if (this.playerTurn === "O") {
         this.playerTurn = "X";
@@ -58,7 +59,7 @@ class TTT {
       }
       Screen.setMessage(`Player ${this.playerTurn}'s move.`);
       Screen.render();
-      TTT.checkWin(this.grid);
+      TTT.checkWin.bind(this, this.grid);
     } else {
       Screen.setMessage(
         "That space is already occupied. Choose another space."
@@ -67,13 +68,7 @@ class TTT {
     }
   }
 
-  static spaceOpen(grid) {
-    //why doesn't this work??
-    if (grid[this.cursor.row][this.cursor.col] === " ") {
-      return true;
-    }
-    return false;
-  }
+  static spaceOpen = (grid) => {};
 
   static checkWin(grid) {
     // Returns 'X' if player X wins
