@@ -68,8 +68,6 @@ class TTT {
     }
   }
 
-  static spaceOpen = (grid) => {};
-
   static checkWin(grid) {
     // Returns 'X' if player X wins
     // Returns 'O' if player O wins
@@ -90,7 +88,7 @@ class TTT {
     } else if (TTT.verticalCheck(grid)) {
       //vertical win
       return TTT.verticalCheck(grid);
-    } else if (fullGrid === true) {
+    } else if (fullGrid) {
       //tie game
       return "T";
     } else {
@@ -111,9 +109,17 @@ class TTT {
   }
 
   static diagonalCheck(grid) {
-    if (grid[0][0] === grid[1][1] && grid[0][0] === grid[2][2]) {
+    if (
+      grid[0][0] !== " " &&
+      grid[0][0] === grid[1][1] &&
+      grid[0][0] === grid[2][2]
+    ) {
       return grid[0][0];
-    } else if (grid[0][2] === grid[1][1] && grid[0][2] === grid[2][0]) {
+    } else if (
+      grid[0][2] !== " " &&
+      grid[0][2] === grid[1][1] &&
+      grid[0][2] === grid[2][0]
+    ) {
       return grid[0][2];
     }
   }
