@@ -12,6 +12,7 @@ class TTT {
     ];
 
     this.cursor = new Cursor(3, 3);
+    this.space = this.grid[this.cursor.row][this.cursor.col];
 
     // Initialize a 3x3 tic-tac-toe grid
     Screen.initialize(3, 3);
@@ -48,15 +49,30 @@ class TTT {
   static placeMove() {
     //what is bind doing exactly in addCommand above?
     Screen.render();
-    Screen.setGrid(this.cursor.row, this.cursor.col, this.playerTurn);
-    if (this.playerTurn === "O") {
-      this.playerTurn = "X";
+    if (TTT.spaceOpen.bind(this.cursor, this.grid)) {
+      Screen.setGrid(this.cursor.row, this.cursor.col, this.playerTurn);
+      if (this.playerTurn === "O") {
+        this.playerTurn = "X";
+      } else {
+        this.playerTurn = "O";
+      }
+      Screen.setMessage(`Player ${this.playerTurn}'s move.`);
+      Screen.render();
+      TTT.checkWin(this.grid);
     } else {
-      this.playerTurn = "O";
+      Screen.setMessage(
+        "That space is already occupied. Choose another space."
+      );
+      Screen.render();
     }
+  }
 
-    Screen.render();
-    TTT.checkWin(this.grid);
+  static spaceOpen(grid) {
+    //why doesn't this work??
+    if (grid[this.cursor.row][this.cursor.col] === " ") {
+      return true;
+    }
+    return false;
   }
 
   static checkWin(grid) {
