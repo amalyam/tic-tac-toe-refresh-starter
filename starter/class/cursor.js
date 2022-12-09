@@ -11,7 +11,7 @@ class Cursor {
 
     this.gridColor = "black";
     this.cursorColor = "yellow";
-    this.textColor = "magenta";
+    this.textColor = "magenta"; //not working
   }
 
   //Use setBackgroundColor and resetBackgroundColor in cursor.js

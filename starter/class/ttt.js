@@ -46,10 +46,17 @@ class TTT {
   }
 
   static placeMove() {
-    //why does this need to be static? what is bind doing exactly in addCommand above?
+    //what is bind doing exactly in addCommand above?
     Screen.render();
     Screen.setGrid(this.cursor.row, this.cursor.col, this.playerTurn);
+    if (this.playerTurn === "O") {
+      this.playerTurn = "X";
+    } else {
+      this.playerTurn = "O";
+    }
+
     Screen.render();
+    TTT.checkWin(this.grid);
   }
 
   static checkWin(grid) {
