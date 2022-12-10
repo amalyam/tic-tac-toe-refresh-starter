@@ -1,17 +1,19 @@
-const Screen = require("./screen");
-const Cursor = require("./cursor");
+import Screen, { GridSpace, Player } from "./screen";
+import Cursor from "./cursor";
 
-class TTT {
+export default class TTT {
+  public playerTurn: Player = "O";
+  public grid: GridSpace[][] = [
+    [" ", " ", " "],
+    [" ", " ", " "],
+    [" ", " ", " "],
+  ];
+
+  public cursor = new Cursor(3, 3);
+  public space: GridSpace;
+
   constructor() {
-    this.playerTurn = "O";
-
-    this.grid = [
-      [" ", " ", " "],
-      [" ", " ", " "],
-      [" ", " ", " "],
-    ];
-
-    this.cursor = new Cursor(3, 3);
+    this.space = this.grid[this.cursor.row][this.cursor.col];
 
     // Initialize a 3x3 tic-tac-toe grid
     Screen.initialize(3, 3);
@@ -39,7 +41,7 @@ class TTT {
     Screen.addCommand(
       "return",
       "place move at cursor position",
-      TTT.placeMove.bind(this)
+      this.placeMove.bind(this)
     );
 
     Screen.addCommand("r", "reset the game", TTT.resetGame.bind(this));
@@ -49,7 +51,7 @@ class TTT {
     Screen.render();
   }
 
-  static placeMove() {
+  placeMove() {
     //what is bind doing exactly in addCommand above?
     Screen.render();
     //why couldn't I do below with this.grid
@@ -62,7 +64,8 @@ class TTT {
       }
       Screen.setMessage(`Player ${this.playerTurn}'s move.`);
       Screen.render();
-      TTT.endGame(TTT.checkWin(Screen.grid));
+      const win = this.checkWin();
+      if (win && win !== " ") TTT.endGame(win);
     } else {
       Screen.setMessage(
         "That space is already occupied. Choose another space."
@@ -71,37 +74,32 @@ class TTT {
     }
   }
 
-  static checkWin(grid) {
+  checkWin(): GridSpace | "T" | false {
     // Returns 'X' if player X wins
     // Returns 'O' if player O wins
     // Returns 'T' if the game is a tie
     // Returns false if the game has not ended
-    const emptyGrid = grid.every((row) => row.every((space) => space === " "));
-    const fullGrid = grid.every((row) => row.every((space) => space !== " "));
+    const emptyGrid = this.grid.every((row) =>
+      row.every((space) => space === " ")
+    );
+    const fullGrid = this.grid.every((row) =>
+      row.every((space) => space !== " ")
+    );
 
     if (emptyGrid) {
       // Return false if the game has not ended
       return false;
-    } else if (TTT.horizontalCheck(grid)) {
-      //horizontal win
-      return TTT.horizontalCheck(grid);
-    } else if (TTT.diagonalCheck(grid)) {
-      //diagonal win
-      return TTT.diagonalCheck(grid);
-    } else if (TTT.verticalCheck(grid)) {
-      //vertical win
-      return TTT.verticalCheck(grid);
-    } else if (fullGrid) {
-      //tie game
-      return "T";
-    } else {
-      // Return false if the game has not ended
-      return false;
     }
+    return (
+      this.horizontalCheck() ||
+      this.diagonalCheck() ||
+      this.verticalCheck() ||
+      (fullGrid ? "T" : false)
+    );
   }
 
-  static horizontalCheck(grid) {
-    let win = grid.find((row) =>
+  horizontalCheck(): GridSpace | false {
+    let win = this.grid.find((row) =>
       row.every((space) => row[0] === space && space != " ")
     );
     if (win) {
@@ -111,29 +109,29 @@ class TTT {
     }
   }
 
-  static diagonalCheck(grid) {
+  diagonalCheck(): Player | undefined {
     if (
-      grid[0][0] !== " " &&
-      grid[0][0] === grid[1][1] &&
-      grid[0][0] === grid[2][2]
+      this.grid[0][0] !== " " &&
+      this.grid[0][0] === this.grid[1][1] &&
+      this.grid[0][0] === this.grid[2][2]
     ) {
-      return grid[0][0];
+      return this.grid[0][0];
     } else if (
-      grid[0][2] !== " " &&
-      grid[0][2] === grid[1][1] &&
-      grid[0][2] === grid[2][0]
+      this.grid[0][2] !== " " &&
+      this.grid[0][2] === this.grid[1][1] &&
+      this.grid[0][2] === this.grid[2][0]
     ) {
-      return grid[0][2];
+      return this.grid[0][2];
     }
   }
 
-  static verticalCheck(grid) {
+  verticalCheck(): GridSpace | false {
     let winningLetter;
-    for (let h = 0; h < grid.length; h++) {
-      winningLetter = grid[0][h];
+    for (let h = 0; h < this.grid.length; h++) {
+      winningLetter = this.grid[0][h];
       let count = 0;
-      for (let v = 1; v < grid[0].length; v++) {
-        if (winningLetter === grid[v][h] && grid[v][h] !== " ") {
+      for (let v = 1; v < this.grid[0].length; v++) {
+        if (winningLetter === this.grid[v][h] && this.grid[v][h] !== " ") {
           count++;
           if (count === 2) {
             return winningLetter;
@@ -156,19 +154,15 @@ class TTT {
     Screen.printCommands();
   }
 
-  static endGame(winner) {
-    if (winner) {
-      if (winner === "O" || winner === "X") {
-        Screen.setMessage(`Player ${winner} wins!`);
-      } else if (winner === "T") {
-        Screen.setMessage(`Tie game!`);
-      } else {
-        Screen.setMessage(`Game Over`);
-      }
-      Screen.render();
-      TTT.playAgain();
+  static endGame(winner: Player | "T") {
+    if (winner === "O" || winner === "X") {
+      Screen.setMessage(`Player ${winner} wins!`);
+    } else if (winner === "T") {
+      Screen.setMessage(`Tie game!`);
+    } else {
+      Screen.setMessage(`Game Over`);
     }
+    Screen.render();
+    TTT.playAgain();
   }
 }
-
-module.exports = TTT;

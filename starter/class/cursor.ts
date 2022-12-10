@@ -1,17 +1,16 @@
-const Screen = require("./screen");
-const TTT = require("./ttt");
+import Screen, { Color, GridSpace } from "./screen";
 
-class Cursor {
-  constructor(numRows, numCols) {
+export default class Cursor {
+  public row = 0;
+  public col = 0;
+
+  public gridColor: Color = "black";
+  public cursorColor: Color = "yellow";
+  public textColor: Color = "magenta"; //not working
+
+  constructor(public numRows: number, public numCols: number) {
     this.numRows = numRows;
     this.numCols = numCols;
-
-    this.row = 0;
-    this.col = 0;
-
-    this.gridColor = "black";
-    this.cursorColor = "yellow";
-    this.textColor = "magenta"; //not working
   }
 
   //Use setBackgroundColor and resetBackgroundColor in cursor.js
@@ -71,11 +70,9 @@ class Cursor {
     this.setBackgroundColor();
   }
 
-  return(playerTurn) {
+  return(playerTurn: GridSpace) {
     this.resetBackgroundColor();
     this.setTextColor();
-    Screen.setGrid(this.cursor.row, this.cursor.col, playerTurn);
+    Screen.setGrid(this.row, this.col, playerTurn);
   }
 }
-
-module.exports = Cursor;

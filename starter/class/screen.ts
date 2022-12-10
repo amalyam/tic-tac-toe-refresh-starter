@@ -1,29 +1,63 @@
-const keypress = require("keypress");
-const Command = require("./command");
+import Command from "./command";
 
-class Screen {
+const keypress = require("keypress");
+
+type ColorCode = `\x1b[${string}m`;
+// TODO: move to TTT
+export type Player = "X" | "O";
+// TODO: should be a generic parameter
+export type GridSpace = Player | " ";
+
+const colorCodes = {
+  black: "\x1b[30m",
+  red: "\x1b[31m",
+  green: "\x1b[32m",
+  yellow: "\x1b[33m",
+  blue: "\x1b[34m",
+  magenta: "\x1b[35m",
+  cyan: "\x1b[36m",
+  white: "\x1b[37m",
+} satisfies Record<string, ColorCode>;
+
+export type Color = keyof typeof colorCodes;
+
+const bgColorCodes = {
+  //background color
+  black: "\x1b[40m",
+  red: "\x1b[41m",
+  green: "\x1b[42m",
+  yellow: "\x1b[43m",
+  blue: "\x1b[44m",
+  cyan: "\x1b[46m",
+  white: "\x1b[47m",
+  magenta: "\x1b[45m",
+} satisfies Record<Color, ColorCode>;
+
+export default class Screen {
   static numCols = 0;
   static numRows = 0;
-  static grid = [];
+  static grid: GridSpace[][] = [];
 
   static borderChar = " ";
   static spacerCount = 1;
 
   static gridLines = false;
 
-  static defaultTextColor = "\x1b[37m"; // White
-  static defaultBackgroundColor = "\x1b[40m"; // Black
+  static defaultTextColor: ColorCode = "\x1b[37m"; // White
+  static defaultBackgroundColor: ColorCode = "\x1b[40m"; // Black
 
-  static textColors = [];
-  static backgroundColors = [];
+  static textColors: ColorCode[][] = [];
+  static backgroundColors: ColorCode[][] = [];
 
   static message = "";
 
-  static commands = {};
+  static commands: Record<string, Command> = {};
 
   static initialized = false;
 
-  static initialize(numRows, numCols) {
+  static quitMessage: string;
+
+  static initialize(numRows: number, numCols: number) {
     Screen.numRows = numRows;
     Screen.numCols = numCols;
 
@@ -40,13 +74,15 @@ class Screen {
     }
 
     Screen.setQuitMessage("\nThank you for playing! \nGoodbye.\n");
+    const quitCmd = new Command("q", "quit the game", Screen.quit);
+    Screen.commands["q"] = quitCmd;
 
     Screen.initialized = true;
 
     Screen.waitForInput();
   }
 
-  static setGridlines(gridLines) {
+  static setGridlines(gridLines: boolean) {
     Screen.gridLines = gridLines;
     Screen.render();
   }
@@ -82,7 +118,7 @@ class Screen {
     process.stdin.resume();
   }
 
-  static setGrid(row, col, char) {
+  static setGrid(row: number, col: number, char: GridSpace) {
     if (!Screen.initialized) return;
 
     if (char.length !== 1) {
@@ -91,11 +127,15 @@ class Screen {
     Screen.grid[row][col] = char;
   }
 
-  static addCommand(key, description, action) {
+  static addCommand(key: string, description: string, action: () => void) {
+    if (key === "q") {
+      throw new Error("you cannot overwrite 'q'");
+    }
+
     Screen.commands[key] = new Command(key, description, action);
   }
 
-  static setQuitMessage(quitMessage) {
+  static setQuitMessage(quitMessage: string) {
     Screen.quitMessage = quitMessage;
   }
 
@@ -120,7 +160,7 @@ class Screen {
     console.log(horizontalBorder);
 
     for (let row = 0; row < Screen.numRows; row++) {
-      const rowCopy = [...Screen.grid[row]];
+      const rowCopy: string[] = [...Screen.grid[row]];
 
       for (let col = 0; col < Screen.numCols; col++) {
         let textColor = Screen.textColors[row][col]
@@ -161,19 +201,8 @@ class Screen {
     console.log(Screen.message);
   }
 
-  static setTextColor(row, col, color) {
+  static setTextColor(row: number, col: number, color: Color) {
     if (!Screen.initialized) return;
-
-    const colorCodes = {
-      black: "\x1b[30m",
-      red: "\x1b[31m",
-      green: "\x1b[32m",
-      yellow: "\x1b[33m",
-      blue: "\x1b[34m",
-      magenta: "\x1b[35m",
-      cyan: "\x1b[36m",
-      white: "\x1b[37m",
-    };
 
     let code = colorCodes[color];
 
@@ -184,22 +213,10 @@ class Screen {
     Screen.textColors[row][col] = code;
   }
 
-  static setBackgroundColor(row, col, color) {
+  static setBackgroundColor(row: number, col: number, color: Color) {
     if (!Screen.initialized) return;
 
-    const colorCodes = {
-      //background color
-      blackBg: "\x1b[40m",
-      redBg: "\x1b[41m",
-      greenBg: "\x1b[42m",
-      yellowBg: "\x1b[43m",
-      blueBg: "\x1b[44m",
-      cyanBg: "\x1b[46m",
-      whiteBg: "\x1b[47m",
-      magentaBg: "\x1b[45m",
-    };
-
-    let code = colorCodes[color + "Bg"];
+    let code = bgColorCodes[color];
 
     if (!code) {
       throw new Error("Invalid background color");
@@ -208,9 +225,7 @@ class Screen {
     Screen.backgroundColors[row][col] = code;
   }
 
-  static setMessage(msg) {
+  static setMessage(msg: string) {
     Screen.message = msg;
   }
 }
-
-module.exports = Screen;

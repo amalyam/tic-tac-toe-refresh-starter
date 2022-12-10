@@ -61,7 +61,7 @@ describe("Cursor", function () {
 
   //new tests below
   it("highlights the cursor's current position on the grid", function () {});
-  expect().to.;
+  // expect().to.;
   cursor.row = 1;
   cursor.col = 1;
 });
