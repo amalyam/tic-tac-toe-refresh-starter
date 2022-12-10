@@ -12,12 +12,11 @@ class TTT {
     ];
 
     this.cursor = new Cursor(3, 3);
-    this.space = this.grid[this.cursor.row][this.cursor.col];
 
     // Initialize a 3x3 tic-tac-toe grid
     Screen.initialize(3, 3);
     Screen.setGridlines(true);
-    this.cursor.setBackgroundColor(); //needed?
+    Screen.printCommands();
 
     Screen.addCommand("up", "move cursor up", this.cursor.up.bind(this.cursor));
     Screen.addCommand(
@@ -42,6 +41,10 @@ class TTT {
       "place move at cursor position",
       TTT.placeMove.bind(this)
     );
+
+    Screen.addCommand("r", "reset the game", TTT.resetGame.bind(this));
+
+    Screen.addCommand("q", "quit the game", Screen.quit);
 
     Screen.render();
   }
@@ -141,6 +144,18 @@ class TTT {
     return false;
   }
 
+  static playAgain() {
+    Screen.setMessage(
+      "Would you like to play again? Press 'r' to reset the game or 'q' to quit."
+    );
+    Screen.render();
+  }
+
+  static resetGame() {
+    Screen.initialize(3, 3);
+    Screen.printCommands();
+  }
+
   static endGame(winner) {
     if (winner) {
       if (winner === "O" || winner === "X") {
@@ -151,7 +166,7 @@ class TTT {
         Screen.setMessage(`Game Over`);
       }
       Screen.render();
-      Screen.quit();
+      TTT.playAgain();
     }
   }
 }
