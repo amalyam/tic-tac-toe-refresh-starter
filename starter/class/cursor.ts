@@ -1,6 +1,6 @@
 import Screen, { Color, GridSpace } from "./screen";
 
-export default class Cursor {
+export default class Cursor<Player extends string> {
   public row = 0;
   public col = 0;
 
@@ -8,26 +8,27 @@ export default class Cursor {
   public cursorColor: Color = "yellow";
   public textColor: Color = "magenta"; //not working
 
-  constructor(public numRows: number, public numCols: number) {
-    this.numRows = numRows;
-    this.numCols = numCols;
-  }
+  constructor(
+    public numRows: number,
+    public numCols: number,
+    public screen: Screen<Player>
+  ) {}
 
   //Use setBackgroundColor and resetBackgroundColor in cursor.js
   //to highlight the cursor's current position on the grid
   resetBackgroundColor() {
-    Screen.setBackgroundColor(this.row, this.col, this.gridColor);
-    Screen.render();
+    this.screen.setBackgroundColor(this.row, this.col, this.gridColor);
+    this.screen.render();
   }
 
   setBackgroundColor() {
-    Screen.setBackgroundColor(this.row, this.col, this.cursorColor);
-    Screen.render();
+    this.screen.setBackgroundColor(this.row, this.col, this.cursorColor);
+    this.screen.render();
   }
 
   setTextColor() {
-    Screen.setTextColor(this.row, this.col, this.textColor);
-    Screen.render();
+    this.screen.setTextColor(this.row, this.col, this.textColor);
+    this.screen.render();
   }
 
   up() {
@@ -70,9 +71,9 @@ export default class Cursor {
     this.setBackgroundColor();
   }
 
-  return(playerTurn: GridSpace) {
+  return(playerTurn: GridSpace<Player>) {
     this.resetBackgroundColor();
     this.setTextColor();
-    Screen.setGrid(this.row, this.col, playerTurn);
+    this.screen.setGrid(this.row, this.col, playerTurn);
   }
 }

@@ -3,10 +3,7 @@ import Command from "./command";
 const keypress = require("keypress");
 
 type ColorCode = `\x1b[${string}m`;
-// TODO: move to TTT
-export type Player = "X" | "O";
-// TODO: should be a generic parameter
-export type GridSpace = Player | " ";
+export type GridSpace<Player extends string> = Player | " ";
 
 const colorCodes = {
   black: "\x1b[30m",
@@ -33,84 +30,87 @@ const bgColorCodes = {
   magenta: "\x1b[45m",
 } satisfies Record<Color, ColorCode>;
 
-export default class Screen {
-  static numCols = 0;
-  static numRows = 0;
-  static grid: GridSpace[][] = [];
+export default class Screen<Player extends string> {
+  static defaultTextColor = colorCodes.white;
+  static defaultBackgroundColor = bgColorCodes.black;
 
-  static borderChar = " ";
-  static spacerCount = 1;
+  numCols = 0;
+  numRows = 0;
+  grid: GridSpace<Player>[][] = [];
 
-  static gridLines = false;
+  borderChar = " ";
+  spacerCount = 1;
 
-  static defaultTextColor: ColorCode = "\x1b[37m"; // White
-  static defaultBackgroundColor: ColorCode = "\x1b[40m"; // Black
+  gridLines = false;
 
-  static textColors: ColorCode[][] = [];
-  static backgroundColors: ColorCode[][] = [];
+  textColors: ColorCode[][] = [];
+  backgroundColors: ColorCode[][] = [];
 
-  static message = "";
+  commands: Record<string, Command> = {};
 
-  static commands: Record<string, Command> = {};
+  initialized = false;
 
-  static initialized = false;
+  message = "";
+  quitMessage: string = "";
 
-  static quitMessage: string;
+  constructor(numRows: number, numCols: number) {
+    this.numRows = numRows;
+    this.numCols = numCols;
+    this.reset();
+  }
+  reset() {
+    this.grid = [];
+    this.textColors = [];
+    this.backgroundColors = [];
 
-  static initialize(numRows: number, numCols: number) {
-    Screen.numRows = numRows;
-    Screen.numCols = numCols;
-
-    Screen.grid = [];
-    Screen.textColors = [];
-    Screen.backgroundColors = [];
-
-    for (let row = 0; row < numRows; row++) {
-      Screen.grid.push(new Array(numCols).fill(" "));
-      Screen.textColors.push(new Array(numCols).fill(Screen.defaultTextColor));
-      Screen.backgroundColors.push(
-        new Array(numCols).fill(Screen.defaultBackgroundColor)
+    for (let row = 0; row < this.numRows; row++) {
+      this.grid.push(new Array(this.numCols).fill(" "));
+      this.textColors.push(
+        new Array(this.numCols).fill(Screen.defaultTextColor)
+      );
+      this.backgroundColors.push(
+        new Array(this.numCols).fill(Screen.defaultBackgroundColor)
       );
     }
 
-    Screen.setQuitMessage("\nThank you for playing! \nGoodbye.\n");
-    const quitCmd = new Command("q", "quit the game", Screen.quit);
-    Screen.commands["q"] = quitCmd;
+    this.setQuitMessage("\nThank you for playing! \nGoodbye.\n");
+    const quitCmd = new Command("q", "quit the game", this.quit);
+    this.commands["q"] = quitCmd;
 
-    Screen.initialized = true;
+    this.initialized = true;
 
-    Screen.waitForInput();
+    this.waitForInput();
   }
 
-  static setGridlines(gridLines: boolean) {
-    Screen.gridLines = gridLines;
-    Screen.render();
+  setGridlines(gridLines: boolean) {
+    this.gridLines = gridLines;
+    this.render();
   }
 
-  static printCommands() {
+  printCommands() {
     console.log("");
 
-    for (let cmd in Screen.commands) {
-      let description = Screen.commands[cmd].description;
+    for (let cmd in this.commands) {
+      let description = this.commands[cmd].description;
       console.log(`  ${cmd} - ${description}`);
     }
 
     console.log("");
   }
 
-  static waitForInput() {
+  waitForInput() {
     keypress(process.stdin);
 
-    process.stdin.on("keypress", function (ch, key) {
+    process.stdin.on("keypress", (ch, key) => {
       if (!key) {
         console.log("Warning: Unknown keypress");
-      } else if (!Screen.commands.hasOwnProperty(key.name)) {
-        Screen.render();
+      } else if (!this.commands.hasOwnProperty(key.name)) {
+        this.render();
         console.log(`${key.name} not supported.`);
-        Screen.printCommands();
+        this.printCommands();
       } else {
-        Screen.render();
-        Screen.commands[key.name].execute();
+        this.render();
+        this.commands[key.name].execute();
       }
     });
 
@@ -118,78 +118,78 @@ export default class Screen {
     process.stdin.resume();
   }
 
-  static setGrid(row: number, col: number, char: GridSpace) {
-    if (!Screen.initialized) return;
+  setGrid(row: number, col: number, char: GridSpace<Player>) {
+    if (!this.initialized) return;
 
     if (char.length !== 1) {
       throw new Error("invalid grid character");
     }
-    Screen.grid[row][col] = char;
+    this.grid[row][col] = char;
   }
 
-  static addCommand(key: string, description: string, action: () => void) {
+  addCommand(key: string, description: string, action: () => void) {
     if (key === "q") {
       throw new Error("you cannot overwrite 'q'");
     }
 
-    Screen.commands[key] = new Command(key, description, action);
+    this.commands[key] = new Command(key, description, action);
   }
 
-  static setQuitMessage(quitMessage: string) {
-    Screen.quitMessage = quitMessage;
+  setQuitMessage(quitMessage: string) {
+    this.quitMessage = quitMessage;
   }
 
-  static quit(showMessage = true) {
-    if (showMessage) console.log(Screen.quitMessage);
+  quit(showMessage = true) {
+    if (showMessage) console.log(this.quitMessage);
     process.exit(1);
   }
 
-  static render() {
-    if (!Screen.initialized) return;
+  render() {
+    if (!this.initialized) return;
 
-    const spacer = new Array(Screen.spacerCount).fill(" ").join("");
+    const spacer = new Array(this.spacerCount).fill(" ").join("");
 
     console.clear();
 
-    let borderLength = Screen.numCols * (Screen.spacerCount * 2 + 1) + 2;
-    if (Screen.gridLines) borderLength += Screen.numCols - 1;
+    let borderLength = this.numCols * (this.spacerCount * 2 + 1) + 2;
+    if (this.gridLines) borderLength += this.numCols - 1;
     let horizontalBorder = new Array(borderLength)
-      .fill(Screen.borderChar)
+      .fill(this.borderChar)
       .join("");
 
     console.log(horizontalBorder);
 
-    for (let row = 0; row < Screen.numRows; row++) {
-      const rowCopy: string[] = [...Screen.grid[row]];
+    for (let row = 0; row < this.numRows; row++) {
+      const rowCopy: string[] = [...this.grid[row]];
 
-      for (let col = 0; col < Screen.numCols; col++) {
-        let textColor = Screen.textColors[row][col]
-          ? Screen.textColors[row][col]
+      for (let col = 0; col < this.numCols; col++) {
+        let textColor = this.textColors[row][col]
+          ? this.textColors[row][col]
           : "";
-        let backgroundColor = Screen.backgroundColors[row][col]
-          ? Screen.backgroundColors[row][col]
+        let backgroundColor = this.backgroundColors[row][col]
+          ? this.backgroundColors[row][col]
           : "";
         if (!(textColor && backgroundColor)) textColor = "\x1b[0m";
 
-        let vertLine = Screen.gridLines && col > 0 ? "|" : "";
+        let vertLine = this.gridLines && col > 0 ? "|" : "";
         rowCopy[
           col
         ] = `${Screen.defaultBackgroundColor}${vertLine}\x1b[0m${textColor}${backgroundColor}${spacer}${rowCopy[col]}${spacer}\x1b[0m`;
       }
 
-      if (Screen.gridLines && row > 0) {
+      if (this.gridLines && row > 0) {
         let horizontalGridLine = new Array(rowCopy.length * 4 - 1).fill("-");
         horizontalGridLine.unshift(
-          `${Screen.borderChar}${Screen.defaultBackgroundColor}`
+          `${this.borderChar}${Screen.defaultBackgroundColor}`
         );
-        horizontalGridLine.push(`\x1b[0m${Screen.borderChar}`);
+        horizontalGridLine.push(`\x1b[0m${this.borderChar}`);
         console.log(horizontalGridLine.join(""));
       }
 
       // console.log(rowCopy);
 
-      rowCopy.unshift(`${Screen.borderChar}`);
-      rowCopy.push(`${Screen.borderChar}`);
+      rowCopy.unshift(`${this.borderChar}`);
+      rowCopy.push(`${this.borderChar}`);
 
       console.log(rowCopy.join(""));
     }
@@ -198,11 +198,11 @@ export default class Screen {
 
     console.log("");
 
-    console.log(Screen.message);
+    console.log(this.message);
   }
 
-  static setTextColor(row: number, col: number, color: Color) {
-    if (!Screen.initialized) return;
+  setTextColor(row: number, col: number, color: Color) {
+    if (!this.initialized) return;
 
     let code = colorCodes[color];
 
@@ -210,11 +210,11 @@ export default class Screen {
       throw new Error("Invalid color");
     }
 
-    Screen.textColors[row][col] = code;
+    this.textColors[row][col] = code;
   }
 
-  static setBackgroundColor(row: number, col: number, color: Color) {
-    if (!Screen.initialized) return;
+  setBackgroundColor(row: number, col: number, color: Color) {
+    if (!this.initialized) return;
 
     let code = bgColorCodes[color];
 
@@ -222,10 +222,10 @@ export default class Screen {
       throw new Error("Invalid background color");
     }
 
-    Screen.backgroundColors[row][col] = code;
+    this.backgroundColors[row][col] = code;
   }
 
-  static setMessage(msg: string) {
-    Screen.message = msg;
+  setMessage(msg: string) {
+    this.message = msg;
   }
 }

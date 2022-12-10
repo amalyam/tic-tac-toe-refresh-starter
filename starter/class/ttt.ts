@@ -1,86 +1,88 @@
-import Screen, { GridSpace, Player } from "./screen";
+import Screen, { GridSpace } from "./screen";
 import Cursor from "./cursor";
 
-export default class TTT {
-  public playerTurn: Player = "O";
+export type Player = "X" | "O";
 
-  public cursor = new Cursor(3, 3);
-  public space: GridSpace;
+export default class TTT {
+  screen: Screen<Player> = new Screen(3, 3);
+  playerTurn: Player = "O";
+
+  cursor = new Cursor(3, 3, this.screen);
+  space: GridSpace<Player> = this.screen.grid[this.cursor.row][this.cursor.col];
 
   constructor() {
-    Screen.grid = [
-      [" ", " ", " "],
-      [" ", " ", " "],
-      [" ", " ", " "],
-    ];
-    this.space = Screen.grid[this.cursor.row][this.cursor.col];
-
     // Initialize a 3x3 tic-tac-toe grid
-    Screen.initialize(3, 3);
-    Screen.setGridlines(true);
-    Screen.printCommands();
+    this.screen.setGridlines(true);
+  }
 
-    Screen.addCommand("up", "move cursor up", this.cursor.up.bind(this.cursor));
-    Screen.addCommand(
+  play() {
+    this.screen.printCommands();
+
+    this.screen.addCommand(
+      "up",
+      "move cursor up",
+      this.cursor.up.bind(this.cursor)
+    );
+    this.screen.addCommand(
       "down",
       "move cursor down",
       this.cursor.down.bind(this.cursor)
     );
-    Screen.addCommand(
+    this.screen.addCommand(
       "left",
       "move cursor left",
       this.cursor.left.bind(this.cursor)
     );
-    Screen.addCommand(
+    this.screen.addCommand(
       "right",
       "move cursor right",
       this.cursor.right.bind(this.cursor)
     );
 
     //Create a command in ttt.js that places a move at the cursor's position
-    Screen.addCommand(
+    this.screen.addCommand(
       "return",
       "place move at cursor position",
       this.placeMove.bind(this)
     );
 
-    Screen.addCommand("r", "reset the game", TTT.resetGame.bind(this));
+    this.screen.addCommand("r", "reset the game", this.resetGame.bind(this));
 
-    Screen.render();
+    this.screen.render();
   }
 
   placeMove() {
     //what is bind doing exactly in addCommand above?
-    Screen.render();
-    //why couldn't I do below with Screen.grid
-    if (Screen.grid[this.cursor.row][this.cursor.col] === " ") {
-      Screen.setGrid(this.cursor.row, this.cursor.col, this.playerTurn);
+    this.screen.render();
+    //why couldn't I do below with this.screen.grid
+    if (this.screen.grid[this.cursor.row][this.cursor.col] === " ") {
+      this.screen.setGrid(this.cursor.row, this.cursor.col, this.playerTurn);
       if (this.playerTurn === "O") {
         this.playerTurn = "X";
       } else {
         this.playerTurn = "O";
       }
-      Screen.setMessage(`Player ${this.playerTurn}'s move.`);
-      Screen.render();
+      this.screen.setMessage(`Player ${this.playerTurn}'s move.`);
+      this.screen.render();
       const win = this.checkWin();
-      if (win && win !== " ") TTT.endGame(win);
+      if (win && win !== " ") this.endGame(win);
     } else {
-      Screen.setMessage(
+      this.screen.setMessage(
         "That space is already occupied. Choose another space."
       );
-      Screen.render();
+      this.screen.render();
     }
   }
 
-  checkWin(): GridSpace | "T" | false {
+  checkWin(): GridSpace<Player> | "T" | false {
     // Returns 'X' if player X wins
     // Returns 'O' if player O wins
     // Returns 'T' if the game is a tie
     // Returns false if the game has not ended
-    const emptyGrid = Screen.grid.every((row) =>
+    const emptyGrid = this.screen.grid.every((row) =>
       row.every((space) => space === " ")
     );
-    const fullGrid = Screen.grid.every((row) =>
+    const fullGrid = this.screen.grid.every((row) =>
       row.every((space) => space !== " ")
     );
 
@@ -98,7 +100,7 @@ export default class TTT {
   }
 
   horizontalCheck(): Player | undefined {
-    let win = Screen.grid.find((row) =>
+    let win = this.screen.grid.find((row) =>
       row.every((space) => row[0] === space && space != " ")
     ) as Player[] | undefined;
     return win?.[0];
@@ -106,27 +108,27 @@ export default class TTT {
 
   diagonalCheck(): Player | undefined {
     if (
-      Screen.grid[0][0] !== " " &&
-      Screen.grid[0][0] === Screen.grid[1][1] &&
-      Screen.grid[0][0] === Screen.grid[2][2]
+      this.screen.grid[0][0] !== " " &&
+      this.screen.grid[0][0] === this.screen.grid[1][1] &&
+      this.screen.grid[0][0] === this.screen.grid[2][2]
     ) {
-      return Screen.grid[0][0];
+      return this.screen.grid[0][0];
     } else if (
-      Screen.grid[0][2] !== " " &&
-      Screen.grid[0][2] === Screen.grid[1][1] &&
-      Screen.grid[0][2] === Screen.grid[2][0]
+      this.screen.grid[0][2] !== " " &&
+      this.screen.grid[0][2] === this.screen.grid[1][1] &&
+      this.screen.grid[0][2] === this.screen.grid[2][0]
     ) {
-      return Screen.grid[0][2];
+      return this.screen.grid[0][2];
     }
   }
 
   verticalCheck(): Player | undefined {
     let winningLetter;
-    for (let h = 0; h < Screen.grid.length; h++) {
-      winningLetter = Screen.grid[0][h];
+    for (let h = 0; h < this.screen.grid.length; h++) {
+      winningLetter = this.screen.grid[0][h];
       let count = 0;
-      for (let v = 1; v < Screen.grid[0].length; v++) {
-        if (winningLetter === Screen.grid[v][h] && winningLetter !== " ") {
+      for (let v = 1; v < this.screen.grid[0].length; v++) {
+        if (winningLetter === this.screen.grid[v][h] && winningLetter !== " ") {
           count++;
           if (count === 2) {
             return winningLetter;
@@ -136,27 +138,27 @@ export default class TTT {
     }
   }
 
-  static playAgain() {
-    Screen.setMessage(
+  playAgain() {
+    this.screen.setMessage(
       "Would you like to play again? Press 'r' to reset the game or 'q' to quit."
     );
-    Screen.render();
+    this.screen.render();
   }
 
-  static resetGame() {
-    Screen.initialize(3, 3);
-    Screen.printCommands();
+  resetGame() {
+    this.screen.reset();
+    this.screen.printCommands();
   }
 
-  static endGame(winner: Player | "T") {
+  endGame(winner: Player | "T") {
     if (winner === "O" || winner === "X") {
-      Screen.setMessage(`Player ${winner} wins!`);
+      this.screen.setMessage(`Player ${winner} wins!`);
     } else if (winner === "T") {
-      Screen.setMessage(`Tie game!`);
+      this.screen.setMessage(`Tie game!`);
     } else {
-      Screen.setMessage(`Game Over`);
+      this.screen.setMessage(`Game Over`);
     }
-    Screen.render();
-    TTT.playAgain();
+    this.screen.render();
+    this.playAgain();
   }
 }
