@@ -11,6 +11,7 @@ class Cursor {
 
     this.gridColor = "black";
     this.cursorColor = "cyan";
+    this.textColor = "yellow";
   }
 
   //Use setBackgroundColor and resetBackgroundColor in cursor.js
@@ -73,8 +74,9 @@ class Cursor {
 
   return(playerTurn) {
     this.resetBackgroundColor();
+    this.setBackgroundColor();
     this.setTextColor();
-    Screen.setGrid(this.cursor.row, this.cursor.col, playerTurn);
+    Screen.setGrid(this.row, this.col, playerTurn);
   }
 }
 

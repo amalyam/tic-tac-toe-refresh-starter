@@ -62,7 +62,7 @@ class TTT {
     Screen.render();
     //why couldn't I do below with this.grid
     if (Screen.grid[this.cursor.row][this.cursor.col] === " ") {
-      Screen.setGrid(this.cursor.row, this.cursor.col, this.playerTurn);
+      this.cursor.return(this.playerTurn);
       if (this.playerTurn === "O") {
         this.setPlayerTurn("X");
       } else {
