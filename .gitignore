@@ -40,8 +40,5 @@ dist/**/*
 # ignore yarn.lock
 yarn.lock
 
-# workspace
-.code-workspace
-
 #experimental code
 grid-tests.js
