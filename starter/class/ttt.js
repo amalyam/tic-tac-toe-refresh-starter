@@ -16,7 +16,6 @@ class TTT {
     // Initialize a 3x3 tic-tac-toe grid
     Screen.initialize(3, 3);
     Screen.setGridlines(true);
-    Screen.printCommands();
 
     Screen.addCommand("up", "move cursor up", this.cursor.up.bind(this.cursor));
     Screen.addCommand(
@@ -47,8 +46,17 @@ class TTT {
     Screen.addCommand("q", "quit the game", Screen.quit);
 
     Screen.render();
+
+    console.log(
+      `Welcome to Tic-Tac-Toe. The players are X and O. first player is ${this.playerTurn}.`
+    );
+    Screen.printCommands();
   }
 
+  setPlayerTurn(turn) {
+    this.playerTurn = turn;
+    Screen.setMessage(`Player ${this.playerTurn}'s move.`);
+  }
   static placeMove() {
     //what is bind doing exactly in addCommand above?
     Screen.render();
@@ -56,11 +64,11 @@ class TTT {
     if (Screen.grid[this.cursor.row][this.cursor.col] === " ") {
       Screen.setGrid(this.cursor.row, this.cursor.col, this.playerTurn);
       if (this.playerTurn === "O") {
-        this.playerTurn = "X";
+        this.setPlayerTurn("X");
       } else {
-        this.playerTurn = "O";
+        this.setPlayerTurn("O");
       }
-      Screen.setMessage(`Player ${this.playerTurn}'s move.`);
+
       Screen.render();
       TTT.endGame(TTT.checkWin(Screen.grid));
     } else {
@@ -82,22 +90,16 @@ class TTT {
     if (emptyGrid) {
       // Return false if the game has not ended
       return false;
-    } else if (TTT.horizontalCheck(grid)) {
-      //horizontal win
-      return TTT.horizontalCheck(grid);
-    } else if (TTT.diagonalCheck(grid)) {
-      //diagonal win
-      return TTT.diagonalCheck(grid);
-    } else if (TTT.verticalCheck(grid)) {
-      //vertical win
-      return TTT.verticalCheck(grid);
-    } else if (fullGrid) {
+    }
+    if (fullGrid) {
       //tie game
       return "T";
-    } else {
-      // Return false if the game has not ended
-      return false;
     }
+    return (
+      TTT.horizontalCheck(grid) ||
+      TTT.diagonalCheck(grid) ||
+      TTT.verticalCheck(grid)
+    );
   }
 
   static horizontalCheck(grid) {
@@ -125,6 +127,7 @@ class TTT {
     ) {
       return grid[0][2];
     }
+    return false;
   }
 
   static verticalCheck(grid) {
@@ -144,29 +147,24 @@ class TTT {
     return false;
   }
 
-  static playAgain() {
-    Screen.setMessage(
-      "Would you like to play again? Press 'r' to reset the game or 'q' to quit."
-    );
+  static resetGame() {
+    Screen.initialize(3, 3);
+    this.setPlayerTurn("O");
     Screen.render();
   }
 
-  static resetGame() {
-    Screen.initialize(3, 3);
-    Screen.printCommands();
-  }
-
   static endGame(winner) {
+    let playAgain =
+      "Would you like to play again? Press 'r' to reset the game or 'q' to quit.";
     if (winner) {
       if (winner === "O" || winner === "X") {
-        Screen.setMessage(`Player ${winner} wins!`);
+        Screen.setMessage(`Player ${winner} wins!\n${playAgain}`);
       } else if (winner === "T") {
-        Screen.setMessage(`Tie game!`);
+        Screen.setMessage(`Tie game!\n${playAgain}`);
       } else {
-        Screen.setMessage(`Game Over`);
+        Screen.setMessage(`Game Over\n${playAgain}`);
       }
       Screen.render();
-      TTT.playAgain();
     }
   }
 }

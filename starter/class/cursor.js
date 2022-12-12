@@ -10,25 +10,21 @@ class Cursor {
     this.col = 0;
 
     this.gridColor = "black";
-    this.cursorColor = "yellow";
-    this.textColor = "magenta"; //not working
+    this.cursorColor = "cyan";
   }
 
   //Use setBackgroundColor and resetBackgroundColor in cursor.js
   //to highlight the cursor's current position on the grid
   resetBackgroundColor() {
     Screen.setBackgroundColor(this.row, this.col, this.gridColor);
-    Screen.render();
   }
 
   setBackgroundColor() {
     Screen.setBackgroundColor(this.row, this.col, this.cursorColor);
-    Screen.render();
   }
 
   setTextColor() {
     Screen.setTextColor(this.row, this.col, this.textColor);
-    Screen.render();
   }
 
   up() {
@@ -39,6 +35,7 @@ class Cursor {
     }
 
     this.setBackgroundColor();
+    Screen.render();
   }
 
   down() {
@@ -49,6 +46,7 @@ class Cursor {
     }
 
     this.setBackgroundColor();
+    Screen.render();
   }
 
   left() {
@@ -59,6 +57,7 @@ class Cursor {
     }
 
     this.setBackgroundColor();
+    Screen.render();
   }
 
   right() {
@@ -69,6 +68,7 @@ class Cursor {
     }
 
     this.setBackgroundColor();
+    Screen.render();
   }
 
   return(playerTurn) {

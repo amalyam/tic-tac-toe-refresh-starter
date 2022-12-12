@@ -41,9 +41,11 @@ class Screen {
 
     Screen.setQuitMessage("\nThank you for playing! \nGoodbye.\n");
 
-    Screen.initialized = true;
+    if (!Screen.initialized) {
+      Screen.waitForInput();
+    }
 
-    Screen.waitForInput();
+    Screen.initialized = true;
   }
 
   static setGridlines(gridLines) {
