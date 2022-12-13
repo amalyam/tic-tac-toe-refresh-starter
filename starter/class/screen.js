@@ -57,8 +57,10 @@ class Screen {
     console.log("");
 
     for (let cmd in Screen.commands) {
-      let description = Screen.commands[cmd].description;
-      console.log(`  ${cmd} - ${description}`);
+      if (Screen.commands[cmd].active) {
+        let description = Screen.commands[cmd].description;
+        console.log(`  ${cmd} - ${description}`);
+      }
     }
 
     console.log("");
@@ -74,9 +76,12 @@ class Screen {
         Screen.render();
         console.log(`${key.name} not supported.`);
         Screen.printCommands();
-      } else {
+      } else if (Screen.commands[key.name].active) {
         Screen.render();
         Screen.commands[key.name].execute();
+      } else {
+        Screen.render();
+        console.log("You can't do that right now!");
       }
     });
 
@@ -95,6 +100,10 @@ class Screen {
 
   static addCommand(key, description, action) {
     Screen.commands[key] = new Command(key, description, action);
+  }
+
+  static pauseCommand(key) {
+    Screen.commands[key].active = false;
   }
 
   static setQuitMessage(quitMessage) {

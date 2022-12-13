@@ -70,7 +70,10 @@ class TTT {
       }
 
       Screen.render();
-      TTT.endGame(TTT.checkWin(Screen.grid));
+      let winner = TTT.checkWin(Screen.grid);
+      if (winner) {
+        TTT.endGame(winner);
+      }
     } else {
       Screen.setMessage(
         "That space is already occupied. Choose another space."
@@ -154,18 +157,22 @@ class TTT {
   }
 
   static endGame(winner) {
+    Object.keys(Screen.commands).forEach((cmd) => {
+      if (!["r", "q"].includes(cmd)) {
+        Screen.pauseCommand(cmd);
+      }
+    });
+
     let playAgain =
       "Would you like to play again? Press 'r' to reset the game or 'q' to quit.";
-    if (winner) {
-      if (winner === "O" || winner === "X") {
-        Screen.setMessage(`Player ${winner} wins!\n${playAgain}`);
-      } else if (winner === "T") {
-        Screen.setMessage(`Tie game!\n${playAgain}`);
-      } else {
-        Screen.setMessage(`Game Over\n${playAgain}`);
-      }
-      Screen.render();
+    if (winner === "O" || winner === "X") {
+      Screen.setMessage(`Player ${winner} wins!\n${playAgain}`);
+    } else if (winner === "T") {
+      Screen.setMessage(`Tie game!\n${playAgain}`);
+    } else {
+      Screen.setMessage(`Game Over\n${playAgain}`);
     }
+    Screen.render();
   }
 }
 
