@@ -81,7 +81,7 @@ class Screen {
         Screen.commands[key.name].execute();
       } else {
         Screen.render();
-        console.log("You can't do that right now!");
+        console.log("You can't do that right now.");
       }
     });
 
@@ -104,6 +104,10 @@ class Screen {
 
   static pauseCommand(key) {
     Screen.commands[key].active = false;
+  }
+
+  static activateCommand(key) {
+    Screen.commands[key].active = true;
   }
 
   static setQuitMessage(quitMessage) {

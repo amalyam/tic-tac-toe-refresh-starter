@@ -1,6 +1,7 @@
 const Screen = require("./screen");
 const Cursor = require("./cursor");
 
+//*Next step -> add functionality to allow the player to change the colors at the beginning of the game
 class TTT {
   constructor() {
     this.playerTurn = "O";
@@ -48,7 +49,7 @@ class TTT {
     Screen.render();
 
     console.log(
-      `Welcome to Tic-Tac-Toe. The players are X and O. first player is ${this.playerTurn}.`
+      `Welcome to Tic-Tac-Toe. The players are X and O. The first player is ${this.playerTurn}.`
     );
     Screen.printCommands();
   }
@@ -152,6 +153,11 @@ class TTT {
 
   static resetGame() {
     Screen.initialize(3, 3);
+    Object.keys(Screen.commands).forEach((cmd) => {
+      if (!["r", "q"].includes(cmd)) {
+        Screen.activateCommand(cmd);
+      }
+    });
     this.setPlayerTurn("O");
     Screen.render();
   }
